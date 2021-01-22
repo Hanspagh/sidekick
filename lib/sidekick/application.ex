@@ -6,14 +6,9 @@ defmodule Sidekick.Application do
   use Application
 
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: Sidekick.Worker.start_link(arg)
-      # {Sidekick.Worker, arg}
-    ]
+    {:ok, _node} = :slave.start('127.0.0.1', :test)
+    {:ok, _node} = Sidekick.start()
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Sidekick.Supervisor]
-    Supervisor.start_link(children, opts)
+    {:ok, self()}
   end
 end
