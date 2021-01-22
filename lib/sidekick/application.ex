@@ -6,6 +6,7 @@ defmodule Sidekick.Application do
   use Application
 
   def start(_type, _args) do
+    :net_kernel.start([:"main2@127.0.0.1"])
     {:ok, _node} = :slave.start('127.0.0.1', :test)
     {:ok, _node} = Sidekick.start()
 
