@@ -3,22 +3,13 @@ defmodule Sidekick do
   Documentation for `Sidekick`.
   """
 
-  def start() do
-    {:ok, node} =  :slave.start('127.0.0.1', :docker)
-    load_paths()
-    call(:docker, Sidekick.Docker, :start, [])
-    {:ok, node}
+  def start(name \\ :docker) do
+    paths = :code.get_path
+    :sidekick.start('127.0.0.1', name, paths)
   end
 
-  defp load_paths() do
-    call(:docker, :code, :add_paths, [:code.get_path])
-  end
 
-  def test_shutdown() do
-    call(:test, :init, :stop, [])
-  end
-
-  def call(node, module, method, args) do
+  def call(node \\ :docker, module, method, args) do
     :rpc.block_call(:"#{node}@127.0.0.1", module, method, args)
   end
 

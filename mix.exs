@@ -6,6 +6,7 @@ defmodule Sidekick.MixProject do
       app: :sidekick,
       version: "0.1.0",
       elixir: "~> 1.10",
+      erlc_paths: ["lib"],
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
