@@ -16,6 +16,10 @@ defmodule Sidekick.Docker do
     :sys.get_state(__MODULE__)
   end
 
+  def mem() do
+    :erlang.memory
+  end
+
   def handle_info({:nodedown, _node}, _state) do
     :init.stop()
   end
