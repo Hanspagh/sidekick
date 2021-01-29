@@ -1,27 +1,19 @@
 defmodule Sidekick.Docker do
-  use GenServer
-
-  def start([parent_node, waiter]) do
-    IO.inspect("Starting Gen server")
-    send({waiter, parent_node}, {self(), :slave_started})
-    GenServer.start_link(__MODULE__, [parent_node], name: __MODULE__)
+  def start() do
+    IO.inspect("Starting Docker")
+    init()
   end
 
-  def init([node]) do
-    Node.monitor(node, true)
-    {:ok, {node}}
+  def init() do
+    System.cmd("docker", ["run", "-dt", "--name", "busybox", "busybox"])
+    :ok
   end
 
-  def state() do
-    :sys.get_state(__MODULE__)
+  def clean_up() do
+    System.cmd("docker", ["rm", "-f", "busybox"])
   end
 
   def mem() do
-    :erlang.memory
+    :erlang.memory()
   end
-
-  def handle_info({:nodedown, _node}, _state) do
-    :init.stop()
-  end
-
 end

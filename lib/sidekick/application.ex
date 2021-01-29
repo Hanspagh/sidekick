@@ -6,7 +6,10 @@ defmodule Sidekick.Application do
   use Application
 
   def start(_type, _args) do
-    :net_kernel.start([:"main@127.0.0.1"])
+
+    #Doesn't work in release mode
+    #:net_kernel.start([:"main@127.0.0.1"])
+
     {:ok, _node} = Sidekick.start()
 
     {:ok, self()}
