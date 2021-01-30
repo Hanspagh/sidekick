@@ -6,10 +6,21 @@ defmodule Sidekick.MixProject do
       app: :sidekick,
       version: "0.1.0",
       elixir: "~> 1.10",
-      erlc_paths: ["lib"],
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
+  end
+
+  defp aliases do
+    [
+      compile: [&gen_boot/1, "compile"],
+    ]
+  end
+
+  defp gen_boot(_) do
+    Mix.shell().info("Generating Bootfile")
+    :systools.make_script('priv/node')
   end
 
   # Run "mix help compile.app" to learn about applications.

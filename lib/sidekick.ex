@@ -36,29 +36,23 @@ defmodule Sidekick do
     end
   end
 
-  defp boot_file_args(release_root) do
-    {:ok, release_version} = System.fetch_env("RELEASE_VSN")
-    {:ok, release_cookie} = System.fetch_env("RELEASE_COOKIE")
-    "-boot #{release_root}/releases/#{release_version}/start_clean -boot_var RELEASE_LIB /Users/hanspagh/Documents/freetime/sidekick/_build/dev/lib/sidekick -setcookie #{release_cookie}"
-  end
-
   defp mk_command(sidekick_node, parent_node, waiter_register) do
     {:ok, command} = :init.get_argument(:progname)
     paths = Enum.join(:code.get_path(), " , ")
 
-    release_root = System.fetch_env("RELEASE_ROOT")
-
-
-    boot_file_args =
-    case release_root do
-      {:ok, release_root} -> boot_file_args(release_root)
-      _ -> ""
-    end
-
     base_args = "-noinput -name #{sidekick_node}"
+
+    priv_dir = :code.priv_dir(:sidekick)
+    boot_file_args = "-boot #{priv_dir}/node"
+
+    release_cookie = System.get_env("RELEASE_COOKIE")
+    cookie_arg = "-setcookie #{release_cookie}"
+
     paths_arg = "-pa #{paths}"
+
     command_args = "-s Elixir.Sidekick start_sidekick #{parent_node} #{waiter_register}"
-    args = "#{base_args} #{boot_file_args} #{paths_arg} #{command_args}"
+
+    args = "#{base_args} #{boot_file_args} #{cookie_arg} #{paths_arg} #{command_args}"
 
     "#{command} #{args}"
   end
