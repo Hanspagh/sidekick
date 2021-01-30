@@ -64,7 +64,7 @@ defmodule Sidekick do
     Sidekick.Docker.start()
     send({waiter, parent_node}, {self(), :started})
 
-
+    :erlang.system_info(:system_version)
     receive do
       {:nodedown, _node} ->
         Sidekick.Docker.clean_up()

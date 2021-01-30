@@ -1,6 +1,0 @@
-%% coding: utf-8
-{release,{"node","0.1.0"},
-         {erts,"11.1.1"},
-         [{kernel,"7.1",permanent},
-          {stdlib,"3.13.2",permanent}
-         ]}.

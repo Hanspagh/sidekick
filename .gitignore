@@ -24,3 +24,4 @@ sidekick-*.tar
 
 priv/node.boot
 priv/node.script
+priv/node.rel
