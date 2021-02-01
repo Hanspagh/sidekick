@@ -35,14 +35,14 @@ defmodule Sidekick.MixProject do
     # |> Enum.filter(&(Kernel.match?({:kernel, _, _}, &1) or Kernel.match?({:stdlib, _, _}, &1)))
     # |> Enum.map(fn {app, _extra, version} -> {app, version} end)
 
-    apps = [:kernel, :stdlib]
+    apps = [:kernel, :stdlib, :elixir, :compiler]
     |> Enum.map(&({&1, get_version(&1)}))
 
     rel_spec = {:release, {'node', '0.1.0'}, {:erts, :erlang.system_info(:version)}, apps}
     File.write!("priv/node.rel", consultable(rel_spec))
 
     Mix.shell().info("Generating node.boot file")
-    :systools.make_script('priv/node')
+    :systools.make_script('priv/node', [:silent])
   end
 
   # Run "mix help compile.app" to learn about applications.

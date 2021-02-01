@@ -18,16 +18,13 @@ defmodule Sidekick do
   end
 
   defp wait_for_sidekick(sidekick_node, parent_node) do
-    waiter_register = :sidekick_waiter
-    Process.register(self(), waiter_register)
-
-    command = mk_command(sidekick_node, parent_node, waiter_register)
+    :net_kernel.monitor_nodes(true)
+    command = mk_command(sidekick_node, parent_node)
     Port.open({:spawn, command}, [:stream])
 
     receive do
-      {sidekick_pid, :started} ->
-        Process.unregister(waiter_register)
-        {:ok, sidekick_pid}
+      {:nodeup, ^sidekick_node} ->
+        {:ok, sidekick_node}
     after
       5000 ->
         # Shutdown node if we never received a response
@@ -36,7 +33,7 @@ defmodule Sidekick do
     end
   end
 
-  defp mk_command(sidekick_node, parent_node, waiter_register) do
+  defp mk_command(sidekick_node, parent_node) do
     {:ok, command} = :init.get_argument(:progname)
     paths = Enum.join(:code.get_path(), " , ")
 
@@ -45,26 +42,22 @@ defmodule Sidekick do
     priv_dir = :code.priv_dir(:sidekick)
     boot_file_args = "-boot #{priv_dir}/node"
 
-    release_cookie = System.get_env("RELEASE_COOKIE")
-    cookie_arg = "-setcookie #{release_cookie}"
+    cookie = Node.get_cookie()
+    cookie_arg = "-setcookie #{cookie}"
 
     paths_arg = "-pa #{paths}"
 
-    command_args = "-s Elixir.Sidekick start_sidekick #{parent_node} #{waiter_register}"
+    command_args = "-s Elixir.Sidekick start_sidekick #{parent_node}"
 
     args = "#{base_args} #{boot_file_args} #{cookie_arg} #{paths_arg} #{command_args}"
 
     "#{command} #{args}"
   end
 
-  def start_sidekick([parent_node, waiter]) do
+  def start_sidekick([parent_node]) do
     Node.monitor(parent_node, true)
-
     #TODO Here we can start any kind of process, we just require a start and clean_up method
     Sidekick.Docker.start()
-    send({waiter, parent_node}, {self(), :started})
-
-    :erlang.system_info(:system_version)
     receive do
       {:nodedown, _node} ->
         Sidekick.Docker.clean_up()
